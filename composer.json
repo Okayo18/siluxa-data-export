@@ -1,0 +1,39 @@
+{
+    "name": "siluxa/data-export",
+    "description": "A reusable Laravel package for exporting data with delayed processing, precise targeting, and notifications.",
+    "type": "library",
+    "version": "1.0.0",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Okayo"
+        }
+    ],
+    "require": {
+        "php": "^8.0",
+        "illuminate/support": "^9.0|^10.0",
+        "illuminate/queue": "^9.0|^10.0",
+        "illuminate/notifications": "^9.0|^10.0",
+        "illuminate/filesystem": "^9.0|^10.0",
+        "maatwebsite/excel": "^3.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Siluxa\\DataExport\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Siluxa\\DataExport\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Siluxa\\DataExport\\DataExportServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
