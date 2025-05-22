@@ -47,6 +47,8 @@ class ExportDataJob implements ShouldQueue
             // Compresser tous les fichiers en un seul ZIP
             $zipPath = DataExportService::compressFiles($allFiles, $baseFilename);
             $disk = config('data-export.notification.disk', 'public');
+
+            //relativePath
             $relativePath = 'exports/' . basename($zipPath);
             $link = Storage::disk($disk)->url($relativePath);
 

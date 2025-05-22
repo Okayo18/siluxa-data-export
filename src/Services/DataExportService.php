@@ -4,6 +4,7 @@ namespace Siluxa\DataExport\Services;
 
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 use ZipArchive;
 
 class DataExportService
@@ -27,8 +28,8 @@ class DataExportService
         }
 
         $files = [];
-        $baseFilename = class_basename($export) . '_' . now()->format('YmdHis');
-        $disk = config('data-export.notification.disk', 'public0');
+        $baseFilename = \Str::limit(class_basename($export), 7, '') . '_' . now()->format('YmdHis');
+        $disk = config('data-export.notification.disk', 'public');
 
         foreach ($formats as $format) {
             $filename = \Str::snake($baseFilename . "." . $format);
@@ -41,16 +42,20 @@ class DataExportService
             }
 
             try {
-                $writerType = match (strtolower($format)) {
-                    'xlsx' => \Maatwebsite\Excel\Excel::XLSX,
-                    'csv' => \Maatwebsite\Excel\Excel::CSV,
-                    'pdf' => \Maatwebsite\Excel\Excel::DOMPDF,
-                    default => throw new \Exception("Format {$format} non supporté.")
-                };
-
-                $success = Excel::store($export, $relativePath, $disk, $writerType, ['visibility' => 'public']);
-
-                if (!$success || !Storage::disk($disk)->exists($relativePath)) {
+                if ($format === 'pdf') {
+                    $view = $export->view();
+                    $pdf = Pdf::loadHTML($view->render());
+                    Storage::disk($disk)->put($relativePath, $pdf->output(), 'public');
+                } else {
+                    $writerType = match (strtolower($format)) {
+                        'xlsx' => \Maatwebsite\Excel\Excel::XLSX,
+                        'csv' => \Maatwebsite\Excel\Excel::CSV,
+                        default => throw new \Exception("Format {$format} non supporté.")
+                    };
+                    Excel::store($export, $relativePath, $disk, $writerType, ['visibility' => 'public']);
+                }
+                
+                if (!Storage::disk($disk)->exists($relativePath)) {
                     \Log::error("Échec de la création du fichier : {$fullPath}");
                 } else {
                     $files[] = $fullPath;
@@ -89,7 +94,7 @@ class DataExportService
 
     public function listExportedFiles()
     {
-        $disk = config('data-export.notification.disk', 'public0');
+        $disk = config('data-export.notification.disk', 'public');
         $files = Storage::disk($disk)->files('exports');
         $fileList = [];
 
@@ -98,11 +103,24 @@ class DataExportService
                 'name' => basename($file),
                 'path' => $file,
                 'url' => Storage::disk($disk)->url($file),
-                'size' => Storage::disk($disk)->size($file) / 1024 . ' KB',
+                'size' => $this->formatBytes(Storage::disk($disk)->size($file)),
                 'last_modified' => date('Y-m-d H:i:s', Storage::disk($disk)->lastModified($file)),
             ];
         }
 
         return $fileList;
     }
+
+    private function formatBytes($bytes, $precision = 2)
+    {
+        $units = ['o', 'Ko', 'Mo', 'Go', 'To'];
+
+        if ($bytes === 0) return '0 o';
+
+        $base = floor(log($bytes, 1024));
+        $value = $bytes / pow(1024, $base);
+
+        return round($value, $precision) . ' ' . $units[$base];
+    }
+
 }

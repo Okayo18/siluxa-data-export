@@ -37,7 +37,7 @@ class ExportDataCommand extends Command
             if (!class_exists($exportClass)) {
                 throw new \Exception("Classe d'exportation {$exportClass} introuvable.");
             }
-            $exportList[] = new $exportClass($formats, $startDate, $endDate);
+            $exportList[] = new $exportClass(null, null,$startDate, $endDate);
         }
 
         // Lancer un job unique pour toutes les exportations
