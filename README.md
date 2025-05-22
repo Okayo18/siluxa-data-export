@@ -48,9 +48,9 @@ chmod -R 775 storage/app/public/exports
 
 
 Configuration
-Edit config/filesystems.php to include the public0 disk:
+Edit config/filesystems.php to include the public disk:
 'disks' => [
-    'public0' => [
+    'public' => [
         'driver' => 'local',
         'root' => storage_path('app/public'),
         'url' => env('APP_URL').'/storage',
@@ -82,7 +82,7 @@ Edit config/data-export.php to define entities, attributes, and relations:
 'storage_path' => storage_path('app/public/exports'),
 'notification' => [
     'emails' => env('EXPORT_NOTIFICATION_EMAILS', 'admin@example.com'),
-    'disk' => 'public0',
+    'disk' => 'public',
     'view' => 'data-export::notifications.export-completed',
     'failed_view' => 'data-export::notifications.export-failed',
 ],

@@ -1,22 +1,15 @@
 <?php
 
 return [
-    // Types d'entités exportables avec conditions, attributs, et relations
-    'entities' => [
+    // Classes d'exportation
+    'exports' => [
         'users' => [
-            'model' => \App\Models\User::class,
-            'conditions' => [], // Ex: ['type' => 'admin'] pour STI
-            'attributes' => ['id', 'name', 'email'], // Attributs à inclure
-            'exclude_attributes' => ['password'], // Attributs à exclure
-            'relations' => [
-                'profile' => ['name', 'phone'], // Relation hasOne
-                'posts' => ['title', 'created_at'], // Relation hasMany
-            ],
+            'class' => \App\Exports\UserExport::class,
         ],
     ],
 
     // Formats de sortie supportés
-    'formats' => ['csv', 'json', 'xlsx', 'pdf'],
+    'formats' => ['csv', 'xlsx', 'pdf'],
 
     // Répertoire de stockage des fichiers exportés
     'storage_path' => storage_path('app/public/exports'),
@@ -25,7 +18,6 @@ return [
     'notification' => [
         'emails' => env('EXPORT_NOTIFICATION_EMAILS', 'admin@example.com'),
         'disk' => 'public',
-        'url_expiration' => 24 * 60, // 24h
         'view' => 'data-export::notifications.export-completed',
         'failed_view' => 'data-export::notifications.export-failed',
     ],
