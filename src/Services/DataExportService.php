@@ -5,6 +5,7 @@ namespace Siluxa\DataExport\Services;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Concerns\FromView;
 use ZipArchive;
 
 class DataExportService
@@ -42,17 +43,19 @@ class DataExportService
             }
 
             try {
-                if ($format === 'pdf') {
+                if ($format === 'pdf' && ($export instanceof FromView)) {
                     $view = $export->view();
                     $pdf = Pdf::loadHTML($view->render());
                     Storage::disk($disk)->put($relativePath, $pdf->output(), 'public');
-                } else {
+                } else if(!($export instanceof FromView)) {
                     $writerType = match (strtolower($format)) {
                         'xlsx' => \Maatwebsite\Excel\Excel::XLSX,
                         'csv' => \Maatwebsite\Excel\Excel::CSV,
                         default => throw new \Exception("Format {$format} non supporté.")
                     };
                     Excel::store($export, $relativePath, $disk, $writerType, ['visibility' => 'public']);
+                }else{
+                    continue;
                 }
                 
                 if (!Storage::disk($disk)->exists($relativePath)) {
