@@ -2,7 +2,7 @@
     "name": "siluxa/data-export",
     "description": "A reusable Laravel package for exporting data with delayed processing, precise targeting, and notifications.",
     "type": "library",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "license": "MIT",
     "authors": [
         {

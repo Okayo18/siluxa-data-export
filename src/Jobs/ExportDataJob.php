@@ -59,8 +59,9 @@ class ExportDataJob implements ShouldQueue
             }
         } catch (\Exception $e) {
             // Journaliser l'erreur
-            Log::error("Échec de l'exportation pour " . implode(', ', $this->exports) . ": {$e->getMessage()}", [
-                'exports' => $this->exports,
+            $exportNames = array_map(fn($e) => is_object($e) ? get_class($e) : $e, $this->exports);
+            Log::error("Échec de l'exportation pour " . implode(', ', $exportNames)  . ": {$e->getMessage()}", [
+                'exports' => $exportNames,
                 'formats' => $this->formats,
                 'exception' => $e,
             ]);
@@ -74,11 +75,13 @@ class ExportDataJob implements ShouldQueue
             throw $e;
         }
     }
-
-    public function failed(\Exception $exception)
+    
+    public function failed(\Throwable $exception)
     {
-        Log::error("Échec définitif de l'exportation pour " . implode(', ', $this->exports) . ": {$exception->getMessage()}", [
-            'exports' => $this->exports,
+        $exportNames = array_map(fn($e) => is_object($e) ? get_class($e) : $e, $this->exports);
+
+        Log::error("Échec définitif de l'exportation pour " . implode(', ', $exportNames) . ": {$exception->getMessage()}", [
+            'exports' => $exportNames,
             'formats' => $this->formats,
         ]);
     }

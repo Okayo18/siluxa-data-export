@@ -47,7 +47,7 @@ class DataExportService
                     $view = $export->view();
                     $pdf = Pdf::loadHTML($view->render());
                     Storage::disk($disk)->put($relativePath, $pdf->output(), 'public');
-                } else if($format !== 'pdf' && !($export instanceof FromView)) {
+                } else if($format !== 'pdf' && !($export instanceof FromView)){
                     $writerType = match (strtolower($format)) {
                         'xlsx' => \Maatwebsite\Excel\Excel::XLSX,
                         'csv' => \Maatwebsite\Excel\Excel::CSV,
@@ -64,7 +64,7 @@ class DataExportService
                     $files[] = $fullPath;
                 }
             } catch (\Throwable $e) {
-                \Log::error("Erreur lors de l'export Excel ({$format}) : {$e->getMessage()}");
+                \Log::error("Erreur lors de l'export Excel ({$format}) : {$e->getMessage()} : {$e}");
             }
         }
 
