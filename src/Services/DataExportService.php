@@ -47,7 +47,7 @@ class DataExportService
                     $view = $export->view();
                     $pdf = Pdf::loadHTML($view->render());
                     Storage::disk($disk)->put($relativePath, $pdf->output(), 'public');
-                } else if(!($export instanceof FromView)) {
+                } else if($format !== 'pdf' && !($export instanceof FromView)) {
                     $writerType = match (strtolower($format)) {
                         'xlsx' => \Maatwebsite\Excel\Excel::XLSX,
                         'csv' => \Maatwebsite\Excel\Excel::CSV,
